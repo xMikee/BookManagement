@@ -1,0 +1,54 @@
+services:
+    app:
+        container_name: angulrabook-app
+        ports:
+            - "8000:80"
+        volumes:
+            - ./:/var/www/html
+        build:
+            context: ./
+            dockerfile: docker/web/Dockerfile
+        environment:
+            - APACHE_DOCUMENT_ROOT=/var/www/html/public
+            - DB_HOST=db
+            - DB_PORT=3306
+            - DB_DATABASE=${DB_DATABASE}
+            - DB_USERNAME=${DB_USERNAME}
+            - DB_PASSWORD=${DB_PASSWORD}
+        depends_on:
+            - db
+        networks:
+            angularbook:
+
+    db:
+        image: mariadb:10.5
+        container_name: angulrabook-db
+        restart: unless-stopped
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${DB_DATABASE}
+            MYSQL_USER: ${DB_USERNAME}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+        ports:
+            - "3306:3306"
+        networks:
+            angularbook:
+
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: angulrabook-phpmyadmin
+        environment:
+            - PMA_HOST=db
+            - PMA_USER=${DB_USERNAME}
+            - PMA_PASSWORD=${DB_PASSWORD}
+        ports:
+            - "8080:80"
+        depends_on:
+            - db
+        networks:
+            angularbook:
+
+networks:
+    angularbook:
+        driver: bridge
