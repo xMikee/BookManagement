@@ -8,4 +8,10 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::resource('users',UserController::class);
+Route::group(['prefix' => 'v1', 'middleware' => 'cors'], function(){
+    Route::resource('users', UserController::class);
+});
+
+/*Route::prefix('v1')->middleware('auth:sanctum')->controller(UserController::class)->group(function () {
+    Route::get('users', 'index');
+});*/
